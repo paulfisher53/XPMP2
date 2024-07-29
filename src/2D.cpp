@@ -183,7 +183,10 @@ void TwoDDrawLabels ()
             };
         
             // Finally: Draw the label
-            XPLMDrawString(c, x, y, (char*)ac.label.c_str(), NULL, xplmFont_Basic);
+            int textWidth = XPLMMeasureString(xplmFont_Proportional, ac.label.c_str(), ac.label.size());
+            x -= (textWidth/2);
+            XPLMDrawTranslucentDarkBox(x - 5, y + 15, x + textWidth, y - 10);
+            XPLMDrawString(c, x, y, (char*)ac.label.c_str(), NULL, xplmFont_Proportional);
         }
         CATCH_AC(ac)
     }
