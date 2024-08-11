@@ -216,7 +216,9 @@ public:
     
     /// aircraft label shown in the 3D world next to the plane
     std::string label;
+    std::string subLabel;
     float       colLabel[4]  = {1.0f,1.0f,0.0f,1.0f};   ///< label base color (RGB)
+    float       colBackground[4]  = {1.0f,1.0f,1.0f,0.7f};
     bool        bDrawLabel   = true;                    ///< Shall this aircraft's label be drawn?
     
     /// How much of the vertical offset shall be applied? (This allows phasing out the vertical offset in higher altitudes.) [0..1]

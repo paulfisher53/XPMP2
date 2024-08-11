@@ -108,6 +108,33 @@ static bool ConvertTo2d(const float x, const float y, const float z,
         return -1.0f <= afNdc[2] && afNdc[2] <= 1.0;
 }
 
+void DrawTranslucentBox(float left, float top, float right, float bottom, float r, float g, float b, float a)
+{
+    XPLMSetGraphicsState(
+            0,  // inEnableFog
+            0,  // inNumberTexUnits
+            0,  // inEnableLighting
+            0,  // inEnableAlphaTesting
+            1,  // inEnableAlphaBlending
+            1,  // inEnableDepthTesting
+            0   // inEnableDepthWriting
+        );
+
+   // Set the color (r, g, b, a) where 'a' is the alpha (transparency)
+   glColor4f(r, g, b, a);
+
+   // Draw the rectangle
+    glBegin(GL_QUADS);
+    {
+        glVertex2f(left, bottom);
+        glVertex2f(left, top);
+        glVertex2f(right, top);
+        glVertex2f(right, bottom);
+    }
+   glEnd();
+
+}
+
 //
 // MARK: Drawing Control
 //
@@ -150,13 +177,13 @@ void TwoDDrawLabels ()
             // (as opposed to across), but finding the exact height of the plane
             // would require scanning the .obj file (well...we do so in CSLObj::FetchVertOfsFromObjFile (), but don't want to scan _every_ file)
             // We just use 3 fixed offset depending on the wake-turbulence category
-            float vertLabelOfs = 7.0f;
+            float vertLabelOfs = 10.0f;
             const XPMP2::CSLModel* pCSLMdl = ac.GetModel();
             if (pCSLMdl) {              // there's no reason why there shouldn't be a CSL model...just to be safe, though
                 switch (pCSLMdl->GetDoc8643().wtc[0])
                 {
-                    case 'L': vertLabelOfs = 3.0f; break;
-                    case 'H': vertLabelOfs = 8.0f; break;
+                    case 'L': vertLabelOfs = 6.0f; break;
+                    case 'H': vertLabelOfs = 11.0f; break;
                 }
             }
         
@@ -167,31 +194,34 @@ void TwoDDrawLabels ()
                              ac.drawInfo.z, x, y))
                 continue;                           // label not visible
 
-            // Determine text color:
-            // It stays as defined by application for half the way to maxLabelDist.
-            // For the other half, it gradually fades to gray.
-            // `rat` determines how much it faded already (factor from 0..1)
-            const float rat =
-            ac.GetCameraDist() < maxLabelDist*0.8f ? 0.0f :                 // first 80%: no fading
-            (ac.GetCameraDist() - maxLabelDist*0.8f) / (maxLabelDist*0.2f); // last  20%: fade to gray (remember: acDist <= maxLabelDist!)
-            constexpr float gray[4] = {0.6f, 0.6f, 0.6f, 1.0f};
-            float c[4] = {
-                (1.0f-rat) * ac.colLabel[0] + rat * gray[0],     // red
-                (1.0f-rat) * ac.colLabel[1] + rat * gray[1],     // green
-                (1.0f-rat) * ac.colLabel[2] + rat * gray[2],     // blue
-                (1.0f-rat) * ac.colLabel[3] + rat * gray[3]      // alpha? (not used for text anyway)
-            };
-        
             // Finally: Draw the label
-            int textWidth = XPLMMeasureString(xplmFont_Proportional, ac.label.c_str(), ac.label.size());
-            x -= (textWidth/2);
-            XPLMDrawTranslucentDarkBox(x - 5, y + 15, x + textWidth, y - 10);
-            XPLMDrawString(c, x, y, (char*)ac.label.c_str(), NULL, xplmFont_Proportional);
+            int labelWidth = XPLMMeasureString(xplmFont_Proportional, ac.label.c_str(), ac.label.size());
+            int subLabelWidth = XPLMMeasureString(xplmFont_Proportional, ac.subLabel.c_str(), ac.subLabel.size());
+            int boxWidth = labelWidth;
+            if (subLabelWidth > boxWidth) {
+                boxWidth = subLabelWidth;
+            }
+
+            // Center the box by adjusting the x-coordinate
+            int boxXStart = x - (boxWidth / 2);
+
+            // Draw the translucent box
+            DrawTranslucentBox(boxXStart - 5, y + 15, boxXStart + boxWidth + 5, y - 10, ac.colBackground[0], ac.colBackground[1], ac.colBackground[2], ac.colBackground[3]);
+
+            // Draw the main label centered within the box
+            int labelX = boxXStart + (boxWidth - labelWidth) / 2;
+            XPLMDrawString(ac.colLabel, labelX, y, (char*)ac.label.c_str(), NULL, xplmFont_Proportional);
+
+            // Draw the sub-label if it exists, also centered within the box
+            if (!ac.subLabel.empty()) {
+                float gray[4] = {1.0f, 1.0f, 1.0f, 0.6f};
+                int subLabelX = boxXStart + (boxWidth - subLabelWidth) / 2;
+                XPLMDrawString(gray, subLabelX, y - 25, (char*)ac.subLabel.c_str(), NULL, xplmFont_Proportional);
+            }
         }
         CATCH_AC(ac)
     }
 }
-
 
 /// Drawing callback, called by X-Plane in every drawing cycle
 int CPLabelDrawing (XPLMDrawingPhase     /*inPhase*/,

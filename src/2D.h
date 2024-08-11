@@ -21,6 +21,14 @@
 #ifndef _2D_h_
 #define _2D_h_
 
+#if LIN
+    #include <GL/gl.h>
+#elif __GNUC__
+    #include <OpenGL/gl.h>
+#else
+    #include <GL/gl.h>
+#endif
+
 namespace XPMP2 {
 
 /// Write the labels of all aircraft
