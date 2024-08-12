@@ -214,9 +214,18 @@ void TwoDDrawLabels ()
 
             // Draw the sub-label if it exists, also centered within the box
             if (!ac.subLabel.empty()) {
-                float gray[4] = {1.0f, 1.0f, 1.0f, 0.6f};
+                const float rat = ac.GetCameraDist() < maxLabelDist*0.5f ? 0.0f :                 // first 80%: no fading
+                            (ac.GetCameraDist() - maxLabelDist*0.5f) / (maxLabelDist*0.5f); // last  20%: fade to gray (remember: acDist <= maxLabelDist!)
+                constexpr float gray[4] = {0.6f, 0.6f, 0.6f, 1.0f};
+                float white[4] = {1.0f, 1.0f, 1.0f, 0.6f};
+                float c[4] = {
+                    (1.0f-rat) * white[0] + rat * gray[0],     // red
+                    (1.0f-rat) * white[1] + rat * gray[1],     // green
+                    (1.0f-rat) * white[2] + rat * gray[2],     // blue
+                    (1.0f-rat) * white[3] + rat * gray[3]      // alpha? (not used for text anyway)
+                };
                 int subLabelX = boxXStart + (boxWidth - subLabelWidth) / 2;
-                XPLMDrawString(gray, subLabelX, y - 25, (char*)ac.subLabel.c_str(), NULL, xplmFont_Proportional);
+                XPLMDrawString(c, subLabelX, y - 25, (char*)ac.subLabel.c_str(), NULL, xplmFont_Proportional);
             }
         }
         CATCH_AC(ac)
