@@ -21,12 +21,15 @@
 #ifndef _2D_h_
 #define _2D_h_
 
-#if LIN
-    #include <GL/gl.h>
-#elif __GNUC__
-    #include <OpenGL/gl.h>
-#else
-    #include <GL/gl.h>
+#if APL == 1
+#include <OpenGL/OpenGL.h>
+#include <OpenGL/glu.h>
+#elif IBM == 1
+#include <GL/gl.h>
+#include <GL/glu.h>
+#elif LIN == 1
+#include <GL/gl.h>
+#include <GL/glu.h>
 #endif
 
 namespace XPMP2 {
