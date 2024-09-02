@@ -178,14 +178,6 @@ void TwoDDrawLabels ()
             // would require scanning the .obj file (well...we do so in CSLObj::FetchVertOfsFromObjFile (), but don't want to scan _every_ file)
             // We just use 3 fixed offset depending on the wake-turbulence category
             float vertLabelOfs = 10.0f;
-            const XPMP2::CSLModel* pCSLMdl = ac.GetModel();
-            if (pCSLMdl) {              // there's no reason why there shouldn't be a CSL model...just to be safe, though
-                switch (pCSLMdl->GetDoc8643().wtc[0])
-                {
-                    case 'L': vertLabelOfs = 6.0f; break;
-                    case 'H': vertLabelOfs = 11.0f; break;
-                }
-            }
         
             // Map the 3D coordinates of the aircraft to 2D coordinates of the flat screen
             int x = -1, y = -1;

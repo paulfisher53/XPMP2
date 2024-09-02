@@ -218,11 +218,7 @@ void CSLObj::SetOtherObjCopyResult (bool bResult)
             LOG_MSG(logERR, ERR_CPY_OBJ_NOT_FOUND,
                     StripXPSysDir(gThreadPath).c_str(),
                     gThreadCSLkey.c_str());
-        }
-    } else {
-        LOG_MSG(logERR, ERR_CPY_MDL_NOT_FOUND,
-                StripXPSysDir(gThreadPath).c_str(),
-                gThreadCSLkey.c_str());
+        }    
     }
 }
 
