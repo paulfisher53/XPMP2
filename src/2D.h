@@ -21,6 +21,17 @@
 #ifndef _2D_h_
 #define _2D_h_
 
+#if APL == 1
+#include <OpenGL/OpenGL.h>
+#include <OpenGL/glu.h>
+#elif IBM == 1
+#include <GL/gl.h>
+#include <GL/glu.h>
+#elif LIN == 1
+#include <GL/gl.h>
+#include <GL/glu.h>
+#endif
+
 namespace XPMP2 {
 
 /// Write the labels of all aircraft
